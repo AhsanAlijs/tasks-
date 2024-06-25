@@ -1,43 +1,51 @@
-// Select the elements to display countdown
-const daysElement = document.querySelector('#days');
-const hoursElement = document.querySelector('#hours');
-const minutesElement = document.querySelector('#minutes');
-const secondsElement = document.querySelector('#second');
+// Function to start the countdown timer
+function startCountdown() {
+    const daysElement = document.getElementById('days');
+    const hoursElement = document.getElementById('hours');
+    const minutesElement = document.getElementById('minutes');
+    const secondsElement = document.getElementById('second');
 
-// Function to update countdown
-function updateCountdown() {
-    // Get current date and time
-    let now = new Date().getTime();
-
-    // Calculate the distance between now and the countdown date
-    let distance = countDownDate - now;
-
-    // Check if the countdown is over
-    if (distance <= 0) {
-        clearInterval(x); // Clear the interval if countdown is expired
-        document.getElementById("countdown").innerHTML = "EXPIRED";
-        return;
+    // Retrieve the countdown date from localStorage, or set a new one if it doesn't exist
+    let countDownDate = localStorage.getItem('countDownDate');
+    if (!countDownDate) {
+        countDownDate = new Date().getTime() + 10 * 24 * 60 * 60 * 1000; // Example: 10 days from now
+        localStorage.setItem('countDownDate', countDownDate);
     }
 
-    // Time calculations for days, hours, minutes and seconds
-    let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    // Update the countdown every second
+    let x = setInterval(function () {
+        // Get current date and time in milliseconds
+        const now = new Date().getTime();
 
-    // Display the result in the respective elements
-    daysElement.textContent = days;
-    hoursElement.textContent = hours;
-    minutesElement.textContent = minutes;
-    secondsElement.textContent = seconds;
+        // Find the distance between now and the countdown date
+        const distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the HTML elements
+        daysElement.textContent = days;
+        hoursElement.textContent = hours;
+        minutesElement.textContent = minutes;
+        secondsElement.textContent = seconds;
+
+        // If the countdown is over, clear the interval
+        if (distance <= 0) {
+            clearInterval(x);
+            daysElement.textContent = '0';
+            hoursElement.textContent = '0';
+            minutesElement.textContent = '0';
+            secondsElement.textContent = '0';
+            document.getElementById("countdown").innerHTML = "EXPIRED";
+            localStorage.removeItem('countDownDate'); // Remove countdown date from localStorage
+        }
+    }, 1000); // Update every second
 }
 
-// Set the date we're counting down to
-let countDownDate = new Date();
-countDownDate.setDate(countDownDate.getDate() + 10);
-
-// Update the countdown every second
-let x = setInterval(updateCountdown, 1000);
-
-// Call updateCountdown once initially to avoid delay in displaying the countdown
-updateCountdown();
+// Start the countdown when the page is loaded
+window.onload = function () {
+    startCountdown();
+};
